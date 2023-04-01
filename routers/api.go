@@ -39,5 +39,3 @@ func StartServer() *gin.Engine {
 
 	return router
 }
-
-// nama
