@@ -1,9 +1,9 @@
 package routers
 
 import (
-	"gin-api/controllers"
+	"books-api/controllers"
 
-	_ "gin-api/docs"
+	_ "books-api/docs"
 
 	"github.com/gin-gonic/gin"
 	ginSwagger "github.com/swaggo/gin-swagger"
@@ -25,15 +25,15 @@ func StartServer() *gin.Engine {
 	router := gin.Default()
 
 	// Read
-	router.GET("/cars/:id", controllers.GetOneCars)
+	router.GET("/books/:id", controllers.GetOneBook)
 	// Read All
-	router.GET("/cars", controllers.GetAllCars)
+	router.GET("/books", controllers.GetAllBooks)
 	// Create
-	router.POST("/cars", controllers.CreateCars)
+	router.POST("/books", controllers.CreateBook)
 	// Update
-	router.PATCH("/cars/:id", controllers.UpdateCar)
+	router.PATCH("/books/:id", controllers.UpdateBook)
 	// Delete
-	router.DELETE("/cars/:id", controllers.DeleteCar)
+	router.DELETE("/books/:id", controllers.DeleteBook)
 
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 

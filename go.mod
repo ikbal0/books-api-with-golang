@@ -1,4 +1,4 @@
-module gin-api
+module books-api
 
 go 1.20
 

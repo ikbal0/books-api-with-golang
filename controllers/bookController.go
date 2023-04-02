@@ -1,9 +1,9 @@
 package controllers
 
 import (
+	"books-api/database"
+	"books-api/models"
 	"fmt"
-	"gin-api/database"
-	"gin-api/models"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -18,18 +18,19 @@ import (
 // @Param id path int true "ID of the car to be deleted"
 // @Success 204 "No content"
 // @Router /cars/{Id} [delete]
-func DeleteCar(c *gin.Context) {
+func DeleteBook(c *gin.Context) {
+	database.StartDB()
 	var db = database.GetDB()
 
-	var carDelete models.Car
-	err := db.First(&carDelete, "Id = ?", c.Param("id")).Error
+	var bookDelete models.Book
+	err := db.First(&bookDelete, "Id = ?", c.Param("id")).Error
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "record has not found!"})
 		return
 	}
 
-	db.Delete(&carDelete)
+	db.Delete(&bookDelete)
 
 	c.JSON(http.StatusOK, gin.H{"data": true})
 }
@@ -43,23 +44,29 @@ func DeleteCar(c *gin.Context) {
 // @Param id path int true "ID of the car to be updated"
 // @Success 200 {object} models.Car
 // @Router /cars/{Id} [patch]
-func UpdateCar(c *gin.Context) {
+func UpdateBook(c *gin.Context) {
+	database.StartDB()
 	var db = database.GetDB()
 
-	var car models.Car
+	var book []models.Book
 
-	err := db.First(&car, "Id = ?", c.Param("id")).Error
+	err := db.First(&book, "Id = ?", c.Param("id")).Error
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "record has not found!"})
 		return
 	}
 
-	var input models.Car
+	var input models.Book
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+
+	bookUpdate := models.Book{NameBook: input.NameBook, Author: input.Author}
+	db.Model(&input).Where("Id = ?", c.Param("id")).Updates(&bookUpdate)
+
+	c.JSON(http.StatusOK, gin.H{"data": bookUpdate})
 }
 
 // CreateCars godoc
@@ -68,23 +75,25 @@ func UpdateCar(c *gin.Context) {
 // @Tags cars
 // @Accept json
 // @Produce json
-// @Param models.Car body models.Car true "create car"
-// @Success 200 {object} models.Car
+// @Param models.Book body models.Book true "create car"
+// @Success 200 {object} models.Book
 // @Router /cars [post]
-func CreateCars(c *gin.Context) {
+func CreateBook(c *gin.Context) {
+	database.StartDB()
+
 	var db = database.GetDB()
 
-	var input models.Car
+	var input models.Book
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	carInput := models.Car{Brand: input.Brand, Price: input.Price, CarType: input.CarType}
-	db.Create(&carInput)
+	bookInput := models.Book{NameBook: input.NameBook, Author: input.Author}
+	db.Create(&bookInput)
 
-	c.JSON(http.StatusOK, gin.H{"data": carInput})
+	c.JSON(http.StatusOK, gin.H{"data": bookInput})
 }
 
 // GetOneCars godoc
@@ -93,21 +102,22 @@ func CreateCars(c *gin.Context) {
 // @Tags cars
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.Car
+// @Success 200 {object} models.Book
 // @Router /cars/{Id} [get]
-func GetOneCars(c *gin.Context) {
+func GetOneBook(c *gin.Context) {
+	database.StartDB()
 	var db = database.GetDB()
 
-	var carOne []models.Car
+	var bookOne []models.Book
 
-	err := db.First(&carOne, "Id = ?", c.Param("id")).Error
+	err := db.First(&bookOne, "Id = ?", c.Param("id")).Error
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "record has not found!"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data one": carOne})
+	c.JSON(http.StatusOK, gin.H{"data one": bookOne})
 }
 
 // GetAllCar godoc
@@ -116,12 +126,13 @@ func GetOneCars(c *gin.Context) {
 // @Tags cars
 // @Accept json
 // @Produce json
-// @Success 200 {object} models.Car
+// @Success 200 {object} models.Book
 // @Router /cars [get]
-func GetAllCars(c *gin.Context) {
+func GetAllBooks(c *gin.Context) {
+	database.StartDB()
 	var db = database.GetDB()
 
-	var cars []models.Car
+	var cars []models.Book
 
 	err := db.Find(&cars).Error
 
